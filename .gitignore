@@ -1,0 +1,17 @@
+# Flutter
+.dart_tool/
+.packages
+build/
+*.iml
+.idea/
+.vscode/
+
+# Env
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Analyze output (generated files, not committed)
+analyze_output*.txt
