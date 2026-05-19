@@ -15,3 +15,9 @@ Thumbs.db
 
 # Analyze output (generated files, not committed)
 analyze_output*.txt
+
+# Signing secrets (never commit these)
+keystore_base64.txt
+*.jks
+*.keystore
+key.properties

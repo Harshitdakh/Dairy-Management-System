@@ -1,0 +1,188 @@
+# ╔══════════════════════════════════════════════════════════════════════════════╗
+# ║  MilkHub – Android Release APK CI/CD Pipeline                              ║
+# ║                                                                            ║
+# ║  Triggers:                                                                 ║
+# ║    • Push to `main` branch                                                 ║
+# ║    • Push of version tags (v*)                                             ║
+# ║    • Manual dispatch (workflow_dispatch)                                   ║
+# ║                                                                            ║
+# ║  What it does:                                                             ║
+# ║    1. Decodes the keystore from GitHub Secrets                             ║
+# ║    2. Writes key.properties for Gradle signing                             ║
+# ║    3. Writes the .env file with Supabase credentials                       ║
+# ║    4. Runs flutter pub get                                                 ║
+# ║    5. Builds a signed, optimized release APK                               ║
+# ║    6. Uploads APK as a build artifact                                      ║
+# ║    7. Creates a GitHub Release with the APK attached                       ║
+# ╚══════════════════════════════════════════════════════════════════════════════╝
+
+name: "🚀 MilkHub Android Release"
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - "v*"          # Trigger on version tags like v1.0.0, v1.2.3
+  workflow_dispatch:   # Allow manual trigger from GitHub Actions UI
+    inputs:
+      release_name:
+        description: "Release name (e.g., v1.0.0)"
+        required: false
+        default: ""
+
+# ─── Permissions ────────────────────────────────────────────────────────────────
+permissions:
+  contents: write      # Required to create releases & upload assets
+
+# ─── Environment variables ──────────────────────────────────────────────────────
+env:
+  FLUTTER_VERSION: "3.32.1"       # Pin Flutter version for reproducible builds
+  JAVA_VERSION: "17"              # Must match build.gradle.kts compileOptions
+
+jobs:
+  # ═══════════════════════════════════════════════════════════════════════════════
+  # Job: Build signed release APK
+  # ═══════════════════════════════════════════════════════════════════════════════
+  build:
+    name: "📦 Build Release APK"
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      # ─── 1. Checkout code ─────────────────────────────────────────────────────
+      - name: "📥 Checkout repository"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # Full history for version tag detection
+
+      # ─── 2. Set up Java (required by Gradle) ─────────────────────────────────
+      - name: "☕ Set up Java ${{ env.JAVA_VERSION }}"
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: ${{ env.JAVA_VERSION }}
+
+      # ─── 3. Set up Flutter ────────────────────────────────────────────────────
+      - name: "🐦 Set up Flutter ${{ env.FLUTTER_VERSION }}"
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      # ─── 4. Verify Flutter installation ───────────────────────────────────────
+      - name: "✅ Verify Flutter installation"
+        run: |
+          flutter --version
+          flutter doctor -v
+
+      # ─── 5. Decode keystore from secrets ──────────────────────────────────────
+      - name: "🔑 Decode Android Keystore"
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/milkhub-release.jks
+          echo "✅ Keystore decoded successfully"
+
+      # ─── 6. Create key.properties ─────────────────────────────────────────────
+      - name: "📝 Create key.properties"
+        run: |
+          cat > android/key.properties << EOF
+          storePassword=${{ secrets.KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=milkhub-release.jks
+          EOF
+          echo "✅ key.properties created"
+
+      # ─── 7. Create .env file ──────────────────────────────────────────────────
+      - name: "🌐 Create .env file"
+        run: |
+          cat > .env << EOF
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}
+          EOF
+          echo "✅ .env created"
+
+      # ─── 8. Install dependencies ──────────────────────────────────────────────
+      - name: "📦 Install Flutter dependencies"
+        run: flutter pub get
+
+      # ─── 9. Build release APK ─────────────────────────────────────────────────
+      - name: "🔨 Build Release APK"
+        run: flutter build apk --release --no-tree-shake-icons
+
+      # ─── 10. Rename APK with version ──────────────────────────────────────────
+      - name: "📋 Rename APK"
+        run: |
+          # Extract version from pubspec.yaml
+          VERSION=$(grep 'version:' pubspec.yaml | sed 's/version: //' | tr -d '[:space:]')
+          APK_NAME="MilkHub-v${VERSION}.apk"
+
+          cp build/app/outputs/flutter-apk/app-release.apk "build/app/outputs/flutter-apk/${APK_NAME}"
+
+          echo "APK_NAME=${APK_NAME}" >> $GITHUB_ENV
+          echo "APK_PATH=build/app/outputs/flutter-apk/${APK_NAME}" >> $GITHUB_ENV
+          echo "APP_VERSION=v${VERSION}" >> $GITHUB_ENV
+
+          # Print APK info
+          echo "✅ APK built: ${APK_NAME}"
+          ls -lh build/app/outputs/flutter-apk/
+
+      # ─── 11. Upload APK as artifact ───────────────────────────────────────────
+      - name: "📤 Upload APK Artifact"
+        uses: actions/upload-artifact@v4
+        with:
+          name: milkhub-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 90
+          if-no-files-found: error
+
+      # ─── 12. Generate release tag ─────────────────────────────────────────────
+      - name: "🏷️ Generate Release Tag"
+        id: tag
+        run: |
+          # Use the pushed tag if available, otherwise generate one
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            TAG="${{ github.ref_name }}"
+          else
+            TAG="${{ env.APP_VERSION }}-build.${{ github.run_number }}"
+          fi
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "📌 Release tag: ${TAG}"
+
+      # ─── 13. Create GitHub Release ────────────────────────────────────────────
+      - name: "🚀 Create GitHub Release"
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: "MilkHub ${{ steps.tag.outputs.tag }}"
+          body: |
+            ## 🥛 MilkHub ${{ steps.tag.outputs.tag }}
+
+            ### 📱 Download
+            Download the APK from the **Assets** section below.
+
+            ### 📋 Build Info
+            | Detail | Value |
+            |--------|-------|
+            | **Build** | #${{ github.run_number }} |
+            | **Commit** | `${{ github.sha }}` |
+            | **Branch** | `${{ github.ref_name }}` |
+            | **Built at** | ${{ github.event.head_commit.timestamp }} |
+            | **Flutter** | ${{ env.FLUTTER_VERSION }} |
+
+            ### ⚙️ What's Included
+            - ✅ Signed release APK
+            - ✅ R8 code shrinking & obfuscation
+            - ✅ Resource shrinking
+            - ✅ ProGuard optimizations
+
+            ---
+            > 💡 **Install:** Download the APK → Enable "Install from unknown sources" → Tap to install
+          files: |
+            ${{ env.APK_PATH }}
+            build/app/outputs/flutter-apk/app-release.apk
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
