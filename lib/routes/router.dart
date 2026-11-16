@@ -18,6 +18,7 @@ import '../features/admin/customer_management_screen.dart';
 import '../features/admin/customer_detail_screen.dart';
 import '../features/admin/edit_seller_screen.dart';
 import '../features/admin/edit_customer_screen.dart';
+import '../features/admin/route_management_screen.dart';
 import '../features/seller/seller_shell.dart';
 import '../features/seller/seller_home_screen.dart';
 import '../features/seller/route_customers_screen.dart';
@@ -135,6 +136,19 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const CustomerManagementScreen(),
       ),
+      GoRoute(
+        path: '/admin/routes',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => const RouteManagementScreen(),
+      ),
+      GoRoute(
+        path: '/admin/route-delivery',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) => RouteCustomersScreen(
+          routeId: state.uri.queryParameters['routeId'],
+          shift: state.uri.queryParameters['shift'],
+        ),
+      ),
 
       // ── Seller Shell (Bottom Nav) ──
       ShellRoute(
@@ -147,7 +161,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/seller/customers',
-            builder: (context, state) => const RouteCustomersScreen(),
+            builder: (context, state) => RouteCustomersScreen(
+              routeId: state.uri.queryParameters['routeId'],
+              shift: state.uri.queryParameters['shift'],
+            ),
           ),
           GoRoute(
             path: '/seller/analytics',

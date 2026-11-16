@@ -2,6 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../models/collection_entry.dart';
 import '../models/customer_bill.dart';
+import '../models/milk_delivery.dart';
 
 class BillingRepository {
   final SupabaseClient _client;
@@ -100,6 +101,13 @@ class BillingRepository {
     String paymentMode = 'cash',
     String? notes,
   }) async {
+    if (amountPaid < 0 || amountPaid.isNegative) {
+      throw ArgumentError('Payment amount cannot be negative');
+    }
+    if (amountPaid == 0) {
+      throw ArgumentError('Payment amount must be greater than zero');
+    }
+
     final normalizedMonth = DateTime(billMonth.year, billMonth.month, 1)
         .toIso8601String()
         .split('T')[0];
@@ -149,6 +157,7 @@ class BillingRepository {
     required String sellerId,
     required String milkType,
     DateTime? date,
+    String shift = 'morning',
     String? notes,
   }) async {
     await _client.from('milk_deliveries').insert({
@@ -161,22 +170,29 @@ class BillingRepository {
       'rate': 0,
       'amount': 0,
       'status': 'skipped',
+      'shift': shift,
       'notes': notes,
     });
   }
 
-  Future<List<Map<String, dynamic>>> getDeliveries({
+  Future<List<MilkDelivery>> getDeliveries({
     String? sellerId,
     String? customerId,
     DateTime? month,
+    String? shift,
   }) async {
-    var query = _client.from('milk_deliveries').select();
+    var query = _client.from('milk_deliveries').select(
+          '*, customers!milk_deliveries_customer_id_fkey(profiles!customers_user_id_fkey(full_name, phone)), sellers(profiles(full_name))',
+        );
 
     if (sellerId != null) {
       query = query.eq('seller_id', sellerId);
     }
     if (customerId != null) {
       query = query.eq('customer_id', customerId);
+    }
+    if (shift != null && shift.isNotEmpty) {
+      query = query.eq('shift', shift);
     }
     if (month != null) {
       final monthStart = DateTime(month.year, month.month, 1)
@@ -189,6 +205,6 @@ class BillingRepository {
     }
 
     final data = await query.order('delivery_date', ascending: false);
-    return (data as List).map((e) => Map<String, dynamic>.from(e)).toList();
+    return (data as List).map((e) => MilkDelivery.fromJson(e)).toList();
   }
 }

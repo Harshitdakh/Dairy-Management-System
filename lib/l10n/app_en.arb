@@ -1,0 +1,545 @@
+{
+  "@@locale": "en",
+  "appTitle": "Milk HUB",
+  "@appTitle": {
+    "description": "Application title displayed in headers and app bar"
+  },
+
+  "admin": "Admin",
+  "@admin": {
+    "description": "Role label for dairy business administrator"
+  },
+  "seller": "Seller",
+  "@seller": {
+    "description": "Role label for milk seller or distributor"
+  },
+  "customer": "Customer",
+  "@customer": {
+    "description": "Role label for household milk customer"
+  },
+  "customers": "Customers",
+  "@customers": {
+    "description": "Plural section title for customer management"
+  },
+  "doodhwala": "Milkman (Doodhwala)",
+  "@doodhwala": {
+    "description": "Vernacular role title for solo milk delivery operator"
+  },
+  "deliveryBoy": "Delivery Boy",
+  "@deliveryBoy": {
+    "description": "Role label for delivery assistant"
+  },
+  "soloMilkman": "Solo Milkman",
+  "@soloMilkman": {
+    "description": "Unified Owner-Seller persona title for self-delivering owners"
+  },
+
+  "save": "Save",
+  "@save": {
+    "description": "Action button to save form data"
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Action button to dismiss dialog or cancel operation"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Destructive action button to remove an entity"
+  },
+  "edit": "Edit",
+  "@edit": {
+    "description": "Action button to modify an existing item"
+  },
+  "add": "Add",
+  "@add": {
+    "description": "Action button to add a new record"
+  },
+  "confirm": "Confirm",
+  "@confirm": {
+    "description": "Action button to confirm an action in a modal"
+  },
+  "search": "Search",
+  "@search": {
+    "description": "Search input hint or action"
+  },
+  "refresh": "Refresh",
+  "@refresh": {
+    "description": "Action to reload list or screen data"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "Navigation action to return to previous screen"
+  },
+  "submit": "Submit",
+  "@submit": {
+    "description": "Action button to submit form or request"
+  },
+  "done": "Done",
+  "@done": {
+    "description": "Action button indicating task completion"
+  },
+  "settings": "Settings",
+  "@settings": {
+    "description": "App settings navigation title"
+  },
+
+  "pending": "Pending",
+  "@pending": {
+    "description": "Status badge for awaiting approval or review"
+  },
+  "approved": "Approved",
+  "@approved": {
+    "description": "Status badge for confirmed and approved item"
+  },
+  "rejected": "Rejected",
+  "@rejected": {
+    "description": "Status badge for declined or rejected item"
+  },
+  "active": "Active",
+  "@active": {
+    "description": "Status badge for active entity"
+  },
+  "inactive": "Inactive",
+  "@inactive": {
+    "description": "Status badge for inactive entity"
+  },
+
+  "shift": "Shift",
+  "@shift": {
+    "description": "Delivery shift label"
+  },
+  "morningShift": "Morning",
+  "@morningShift": {
+    "description": "Morning delivery shift option"
+  },
+  "eveningShift": "Evening",
+  "@eveningShift": {
+    "description": "Evening delivery shift option"
+  },
+  "bothShifts": "Both Shifts",
+  "@bothShifts": {
+    "description": "Option covering both morning and evening delivery shifts"
+  },
+
+  "cowMilk": "Cow Milk",
+  "@cowMilk": {
+    "description": "Milk variety: Cow Milk"
+  },
+  "buffaloMilk": "Buffalo Milk",
+  "@buffaloMilk": {
+    "description": "Milk variety: Buffalo Milk"
+  },
+  "mixedMilk": "Mixed Milk",
+  "@mixedMilk": {
+    "description": "Milk variety: Mixed Cow and Buffalo Milk"
+  },
+  "ratePerLiter": "Rate per Liter",
+  "@ratePerLiter": {
+    "description": "Price per liter of milk"
+  },
+  "quantity": "Quantity",
+  "@quantity": {
+    "description": "Milk volume or quantity label"
+  },
+  "liters": "Liters",
+  "@liters": {
+    "description": "Unit label for liters"
+  },
+  "milliliters": "Milliliters",
+  "@milliliters": {
+    "description": "Unit label for milliliters"
+  },
+
+  "delivered": "✔ Delivered",
+  "@delivered": {
+    "description": "Delivery status action or badge indicating successful delivery"
+  },
+  "notDeliveredToday": "✕ Skipped Today",
+  "@notDeliveredToday": {
+    "description": "Delivery status action indicating customer skipped milk today"
+  },
+  "skipped": "Skipped",
+  "@skipped": {
+    "description": "Short status indicator for skipped delivery"
+  },
+  "pausedVacation": "⛔ Milk Paused (Vacation)",
+  "@pausedVacation": {
+    "description": "Delivery status badge showing active vacation pause"
+  },
+  "vacation": "Vacation",
+  "@vacation": {
+    "description": "General term for delivery pause or vacation period"
+  },
+  "deliveryEntry": "Delivery Entry",
+  "@deliveryEntry": {
+    "description": "Button or header to record milk delivery"
+  },
+
+  "route": "Route",
+  "@route": {
+    "description": "Single delivery route label"
+  },
+  "routes": "Routes",
+  "@routes": {
+    "description": "Plural label for delivery routes management"
+  },
+  "stopSequence": "Stop Sequence",
+  "@stopSequence": {
+    "description": "Label for sequential stop ordering along delivery route"
+  },
+  "customerSequence": "Customer Sequence",
+  "@customerSequence": {
+    "description": "Ordered sequence number of customer on route"
+  },
+  "routeCustomers": "Route Customers",
+  "@routeCustomers": {
+    "description": "Header for list of customers assigned to route"
+  },
+  "reorderStops": "Reorder Stops",
+  "@reorderStops": {
+    "description": "Action to drag and drop reorder stops"
+  },
+  "addRoute": "Add Route",
+  "@addRoute": {
+    "description": "Action to create a new delivery route"
+  },
+  "editRoute": "Edit Route",
+  "@editRoute": {
+    "description": "Action to modify route details"
+  },
+  "deleteRoute": "Delete Route",
+  "@deleteRoute": {
+    "description": "Action to delete a route"
+  },
+  "routeName": "Route Name",
+  "@routeName": {
+    "description": "Input field label for naming a route"
+  },
+
+  "payViaUpi": "Pay via UPI",
+  "@payViaUpi": {
+    "description": "Button label initiating NPCI UPI payment intent"
+  },
+  "scanQrToPay": "Scan QR Code to Pay",
+  "@scanQrToPay": {
+    "description": "Header or instructions for static UPI QR code modal"
+  },
+  "cashCollected": "Cash Collected",
+  "@cashCollected": {
+    "description": "Action or badge for doorstep cash collection"
+  },
+  "doorstepCashCollected": "Doorstep Cash Collected",
+  "@doorstepCashCollected": {
+    "description": "Full label for in-person cash payment logging"
+  },
+  "shareInvoiceWhatsapp": "Share Invoice on WhatsApp",
+  "@shareInvoiceWhatsapp": {
+    "description": "Action launching native WhatsApp invoice message"
+  },
+  "monthlyBill": "Monthly Bill",
+  "@monthlyBill": {
+    "description": "Header and label for monthly billing invoice"
+  },
+  "totalLiters": "Total Liters",
+  "@totalLiters": {
+    "description": "Summary label for aggregated milk liters in billing period"
+  },
+  "totalAmount": "Total Amount",
+  "@totalAmount": {
+    "description": "Summary label for aggregated billed amount"
+  },
+  "pendingAmount": "Pending Amount",
+  "@pendingAmount": {
+    "description": "Label for remaining unpaid balance"
+  },
+  "paidAmount": "Paid Amount",
+  "@paidAmount": {
+    "description": "Label for recorded payments received"
+  },
+  "monthlySummary": "Monthly Summary",
+  "@monthlySummary": {
+    "description": "Header for month-to-date consumption and cost summary"
+  },
+  "recordCollection": "Record Collection",
+  "@recordCollection": {
+    "description": "Header and button to log payment collection"
+  },
+
+  "pauseMilk": "Pause Milk Delivery",
+  "@pauseMilk": {
+    "description": "Action button for customer to request vacation pause"
+  },
+  "pauseRequest": "Pause Request",
+  "@pauseRequest": {
+    "description": "Header for customer vacation pause request dialog"
+  },
+  "startDate": "Start Date",
+  "@startDate": {
+    "description": "Calendar field for pause starting date"
+  },
+  "endDate": "End Date",
+  "@endDate": {
+    "description": "Calendar field for pause ending date"
+  },
+  "reason": "Reason",
+  "@reason": {
+    "description": "Optional notes or reason for delivery pause"
+  },
+  "pendingApprovals": "Pending Approvals",
+  "@pendingApprovals": {
+    "description": "Section header for pause requests awaiting seller review"
+  },
+  "approvePause": "Approve Pause",
+  "@approvePause": {
+    "description": "Action button to approve customer vacation pause"
+  },
+  "rejectPause": "Reject Pause",
+  "@rejectPause": {
+    "description": "Action button to reject customer vacation pause"
+  },
+
+  "language": "Language",
+  "@language": {
+    "description": "Label for app language configuration"
+  },
+  "english": "English",
+  "@english": {
+    "description": "Name of English language"
+  },
+  "hindi": "Hindi",
+  "@hindi": {
+    "description": "Name of Hindi language"
+  },
+  "hindiLanguage": "Hindi (हिंदी)",
+  "@hindiLanguage": {
+    "description": "Bilingual label for Devanagari Hindi"
+  },
+  "englishLanguage": "English",
+  "@englishLanguage": {
+    "description": "Label for English language option"
+  },
+  "switchLanguage": "Switch Language",
+  "@switchLanguage": {
+    "description": "Settings action title for toggling app language"
+  },
+  "switchLanguageSubtitle": "Switch app language / ऐप की भाषा बदलें",
+  "@switchLanguageSubtitle": {
+    "description": "Bilingual subtitle explaining language switch"
+  },
+  "keepScreenAwake": "Keep Screen Awake",
+  "@keepScreenAwake": {
+    "description": "Delivery sheet toggle to prevent screen timeout"
+  },
+  "logout": "Logout",
+  "@logout": {
+    "description": "Sign out action button"
+  },
+  "logoutSubtitle": "Ends session and clears Remember Me",
+  "@logoutSubtitle": {
+    "description": "Subtitle describing logout effect"
+  },
+
+  "welcomeUser": "Welcome, {userName}",
+  "@welcomeUser": {
+    "description": "Personalized dashboard greeting",
+    "placeholders": {
+      "userName": {
+        "type": "String",
+        "example": "Ramesh"
+      }
+    }
+  },
+  "stopSequenceBadge": "Stop #{sequence}",
+  "@stopSequenceBadge": {
+    "description": "Visual stop badge display on customer card",
+    "placeholders": {
+      "sequence": {
+        "type": "int",
+        "example": "1"
+      }
+    }
+  },
+  "formatRupees": "₹{amount}",
+  "@formatRupees": {
+    "description": "Rupee currency formatting",
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "450"
+      }
+    }
+  },
+  "formatLiters": "{liters} L",
+  "@formatLiters": {
+    "description": "Milk volume formatting in liters",
+    "placeholders": {
+      "liters": {
+        "type": "String",
+        "example": "1.5"
+      }
+    }
+  },
+
+  "allShifts": "All Shifts",
+  "@allShifts": {
+    "description": "Filter option to view all delivery shifts"
+  },
+  "manageRoutes": "Manage Routes",
+  "@manageRoutes": {
+    "description": "Header for route management screen"
+  },
+  "noRoutesFound": "No delivery routes found",
+  "@noRoutesFound": {
+    "description": "Empty state message when no delivery routes exist"
+  },
+  "createFirstRoute": "Create your first route to organize deliveries",
+  "@createFirstRoute": {
+    "description": "Helper text guiding user to create a route"
+  },
+  "routeDescription": "Description (Optional)",
+  "@routeDescription": {
+    "description": "Input field label for route description"
+  },
+  "assignedSeller": "Assigned Seller",
+  "@assignedSeller": {
+    "description": "Label for seller assigned to route"
+  },
+  "selectSeller": "Select Seller",
+  "@selectSeller": {
+    "description": "Dropdown placeholder to pick a seller"
+  },
+  "noSellerAssigned": "No seller assigned (Owner Delivery)",
+  "@noSellerAssigned": {
+    "description": "Indicates route is handled directly by dairy owner"
+  },
+  "unassigned": "Unassigned",
+  "@unassigned": {
+    "description": "Status badge for customer or route without assigned seller"
+  },
+  "customerCountBadge": "{count, plural, =0{No customers} =1{1 Customer} other{{count} Customers}}",
+  "@customerCountBadge": {
+    "description": "Pluralized customer count badge",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "deleteRouteConfirmTitle": "Delete Route",
+  "@deleteRouteConfirmTitle": {
+    "description": "Title for route deletion confirmation dialog"
+  },
+  "deleteRouteConfirmMessage": "Are you sure you want to delete this route? Customer sequence assignments will be reset.",
+  "@deleteRouteConfirmMessage": {
+    "description": "Warning message before deleting route"
+  },
+  "sequenceUpdated": "Customer delivery sequence updated successfully",
+  "@sequenceUpdated": {
+    "description": "Snackbar message after reordering customer stops"
+  },
+  "routeSaved": "Route saved successfully",
+  "@routeSaved": {
+    "description": "Snackbar confirmation after creating or editing a route"
+  },
+  "routeDeleted": "Route deleted successfully",
+  "@routeDeleted": {
+    "description": "Snackbar confirmation after deleting a route"
+  },
+  "saveSequence": "Save Sequence",
+  "@saveSequence": {
+    "description": "Action button to persist stop sequence ordering"
+  },
+  "dragToReorder": "Drag handles to reorder delivery stops",
+  "@dragToReorder": {
+    "description": "Instruction subtitle for reorderable list"
+  },
+  "selectRoute": "Select Route",
+  "@selectRoute": {
+    "description": "Dropdown or filter title for choosing a route"
+  },
+  "allRoutes": "All Routes",
+  "@allRoutes": {
+    "description": "Filter tab showing all delivery routes"
+  },
+  "activeRoute": "Active Route",
+  "@activeRoute": {
+    "description": "Badge indicating currently selected route"
+  },
+  "noRoutesAssigned": "No routes assigned yet",
+  "@noRoutesAssigned": {
+    "description": "Placeholder when seller has no assigned routes"
+  },
+  "startDelivery": "Start Delivery",
+  "@startDelivery": {
+    "description": "Button to begin delivery along the selected route"
+  },
+  "viewCustomers": "View Customers",
+  "@viewCustomers": {
+    "description": "Button to inspect route customer list"
+  },
+  "todaysInventory": "Today's Inventory",
+  "@todaysInventory": {
+    "description": "Header for daily milk allocation and stock"
+  },
+  "assigned": "Assigned",
+  "@assigned": {
+    "description": "Inventory metric: allocated milk volume"
+  },
+  "soldToday": "Sold Today",
+  "@soldToday": {
+    "description": "Inventory metric: delivered milk volume today"
+  },
+  "remaining": "Remaining",
+  "@remaining": {
+    "description": "Inventory metric: remaining unsold milk volume"
+  },
+  "collectionSnapshot": "Collection Snapshot",
+  "@collectionSnapshot": {
+    "description": "Header for cash and billing collection summary"
+  },
+  "billed": "Billed",
+  "@billed": {
+    "description": "Metric: total amount billed for period"
+  },
+  "collected": "Collected",
+  "@collected": {
+    "description": "Metric: total amount collected"
+  },
+  "deliveryReminder": "Delivery Reminder",
+  "@deliveryReminder": {
+    "description": "Calendar reminder action for delivery route schedule"
+  },
+  "stockRefill": "Stock Refill",
+  "@stockRefill": {
+    "description": "Calendar reminder action for restocking milk inventory"
+  },
+  "openCalendar": "Open Calendar",
+  "@openCalendar": {
+    "description": "Action to open monthly delivery calendar"
+  },
+  "welcomeBack": "Welcome Back",
+  "@welcomeBack": {
+    "description": "Greeting header on dashboard"
+  },
+  "sellerNotFound": "Seller record not found.\nPlease contact admin.",
+  "@sellerNotFound": {
+    "description": "Error banner when user lacks seller record"
+  },
+  "noCustomersOnRoute": "No customers on this route",
+  "@noCustomersOnRoute": {
+    "description": "Placeholder for empty route customer list"
+  },
+  "ownerDelivery": "Owner-Seller Delivery",
+  "@ownerDelivery": {
+    "description": "Direct delivery route launcher for dairy owners"
+  },
+  "deliverRoute": "Deliver Route",
+  "@deliverRoute": {
+    "description": "Action button to execute delivery run on route"
+  },
+  "quickDeliver": "Deliver Now",
+  "@quickDeliver": {
+    "description": "One-touch button to start active delivery"
+  }
+}

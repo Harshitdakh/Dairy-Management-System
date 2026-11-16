@@ -66,6 +66,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         default:
           context.go('/login');
       }
+    } on AuthException catch (e) {
+      _showError(e.message);
     } catch (e) {
       _showError(e.toString().replaceAll('Exception: ', ''));
     } finally {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../config/theme.dart';
 import '../../providers/auth_provider.dart';
 
@@ -47,7 +48,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
     try {
       final repo = ref.read(authRepositoryProvider);
-      await repo.signUp(
+      final res = await repo.signUp(
         email: _emailController.text.trim(),
         password: _passwordController.text,
         fullName: _nameController.text.trim(),
@@ -56,6 +57,19 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       );
 
       if (!mounted) return;
+
+      if (res.session == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Account created! Please sign in.'),
+            backgroundColor: AppTheme.success,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+        );
+        context.go('/login');
+        return;
+      }
 
       ref.invalidate(profileProvider);
       ref.invalidate(authStateProvider);
@@ -74,6 +88,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         default:
           context.go('/login');
       }
+    } on AuthException catch (e) {
+      _showError(e.message);
     } catch (e) {
       _showError(e.toString().replaceAll('Exception: ', ''));
     } finally {

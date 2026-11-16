@@ -26,6 +26,13 @@ final customersBySellerProvider =
   return await repo.getCustomersBySeller(sellerId);
 });
 
+/// Customers by route (ordered by delivery sequence)
+final customersByRouteProvider =
+    FutureProvider.family<List<Customer>, String>((ref, routeId) async {
+  final repo = ref.read(customerRepositoryProvider);
+  return await repo.getCustomersByRoute(routeId);
+});
+
 /// Current customer (for logged-in customer user)
 final currentCustomerProvider = FutureProvider<Customer?>((ref) async {
   final userId = Supabase.instance.client.auth.currentUser?.id;

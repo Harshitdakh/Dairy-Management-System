@@ -10,6 +10,10 @@ import '../../providers/seller_provider.dart';
 import '../../providers/customer_provider.dart';
 import '../../providers/milk_provider.dart';
 import '../../providers/billing_provider.dart';
+import '../../providers/route_provider.dart';
+import '../../providers/pause_provider.dart';
+import '../seller/pending_pauses_card.dart';
+import '../../l10n/l10n.dart';
 import '../../widgets/stat_card.dart';
 
 class AdminDashboardScreen extends ConsumerWidget {
@@ -37,6 +41,7 @@ class AdminDashboardScreen extends ConsumerWidget {
             ref.invalidate(todayVolumeProvider);
             ref.invalidate(todayRevenueProvider);
             ref.invalidate(collectionSummaryProvider(currentMonth));
+            ref.invalidate(allPendingPausesProvider);
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -213,22 +218,37 @@ class AdminDashboardScreen extends ConsumerWidget {
                       color: AppTheme.primary,
                       onTap: () => context.push('/admin/add-seller'),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
                     _QuickActionBtn(
                       icon: Icons.group_add,
                       label: 'Add Customer',
                       color: AppTheme.success,
                       onTap: () => context.push('/admin/add-customer'),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 8),
                     _QuickActionBtn(
                       icon: Icons.water_drop,
                       label: 'Assign Milk',
                       color: AppTheme.amber,
                       onTap: () => context.push('/admin/assign-milk'),
                     ),
+                    const SizedBox(width: 8),
+                    _QuickActionBtn(
+                      icon: Icons.alt_route,
+                      label: context.l10n.routes,
+                      color: AppTheme.cyan,
+                      onTap: () => context.push('/admin/routes'),
+                    ),
                   ],
                 ),
+                const SizedBox(height: 24),
+
+                // ── Unified Owner-Seller Solo Delivery ──
+                const _SoloDeliveryCard(),
+                const SizedBox(height: 20),
+
+                // ── Pending Vacation Pauses Review Card (Admin View) ──
+                const PendingPausesCard(),
                 const SizedBox(height: 28),
 
                 // ── Recent Activity ──
@@ -378,14 +398,240 @@ class _QuickActionBtn extends StatelessWidget {
               Text(
                 label,
                 style: GoogleFonts.workSans(
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: FontWeight.w600,
                   color: AppTheme.textPrimary,
                 ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _SoloDeliveryCard extends ConsumerStatefulWidget {
+  const _SoloDeliveryCard();
+
+  @override
+  ConsumerState<_SoloDeliveryCard> createState() => _SoloDeliveryCardState();
+}
+
+class _SoloDeliveryCardState extends ConsumerState<_SoloDeliveryCard> {
+  String? _selectedRouteId;
+  String _selectedShift = 'morning';
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    final routesAsync = ref.watch(allRoutesProvider);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppTheme.primary.withValues(alpha: 0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryLight,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.two_wheeler,
+                    color: AppTheme.primary, size: 22),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.ownerDelivery,
+                      style: GoogleFonts.workSans(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 16,
+                        color: AppTheme.textPrimary,
+                      ),
+                    ),
+                    Text(
+                      l10n.soloMilkman,
+                      style: GoogleFonts.workSans(
+                        fontSize: 12,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              OutlinedButton.icon(
+                onPressed: () => context.push('/admin/routes'),
+                icon: const Icon(Icons.tune, size: 16),
+                label: Text(l10n.routes),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.primary,
+                  side: const BorderSide(color: AppTheme.primary),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  minimumSize: const Size(64, 40),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          routesAsync.when(
+            data: (routes) {
+              if (routes.isEmpty) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.createFirstRoute,
+                      style: GoogleFonts.workSans(
+                        fontSize: 13,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    FilledButton.icon(
+                      onPressed: () => context.push('/admin/routes'),
+                      icon: const Icon(Icons.add, size: 18),
+                      label: Text(l10n.addRoute),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppTheme.primary,
+                        minimumSize: const Size(120, 48),
+                      ),
+                    ),
+                  ],
+                );
+              }
+
+              if (_selectedRouteId == null ||
+                  !routes.any((r) => r.id == _selectedRouteId)) {
+                _selectedRouteId = routes.first.id;
+              }
+              final selectedRoute =
+                  routes.firstWhere((r) => r.id == _selectedRouteId);
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  DropdownButtonFormField<String>(
+                    key: ValueKey(_selectedRouteId),
+                    initialValue: _selectedRouteId,
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      labelText: l10n.selectRoute,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    items: routes.map((r) {
+                      return DropdownMenuItem<String>(
+                        value: r.id,
+                        child: Text(
+                          '${r.name} (${l10n.customerCountBadge(r.customerCount ?? 0)})',
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) setState(() => _selectedRouteId = val);
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        ChoiceChip(
+                          avatar: const Icon(Icons.wb_sunny_outlined, size: 14),
+                          label: Text(l10n.morningShift),
+                          selected: _selectedShift == 'morning',
+                          onSelected: (sel) {
+                            if (sel) setState(() => _selectedShift = 'morning');
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        ChoiceChip(
+                          avatar:
+                              const Icon(Icons.nights_stay_outlined, size: 14),
+                          label: Text(l10n.eveningShift),
+                          selected: _selectedShift == 'evening',
+                          onSelected: (sel) {
+                            if (sel) setState(() => _selectedShift = 'evening');
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        ChoiceChip(
+                          avatar: const Icon(Icons.sync, size: 14),
+                          label: Text(l10n.allShifts),
+                          selected: _selectedShift == 'all',
+                          onSelected: (sel) {
+                            if (sel) setState(() => _selectedShift = 'all');
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: FilledButton.icon(
+                      onPressed: () {
+                        context.push(
+                          '/admin/route-delivery?routeId=${selectedRoute.id}&shift=$_selectedShift',
+                        );
+                      },
+                      icon: const Icon(Icons.play_arrow, size: 20),
+                      label: Text(
+                        '${l10n.startDelivery} (${selectedRoute.name})',
+                        style: GoogleFonts.workSans(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                      ),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: AppTheme.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
+            loading: () => const Center(
+              child: Padding(
+                padding: EdgeInsets.all(12),
+                child: CircularProgressIndicator(),
+              ),
+            ),
+            error: (e, _) => Text('Error: $e'),
+          ),
+        ],
       ),
     );
   }

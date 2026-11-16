@@ -18,6 +18,27 @@ class AppTheme {
   static const Color cyan = Color(0xFF06B6D4);
   static const Color divider = Color(0xFFE5E7EB);
 
+  // ── Dairy Domain Semantic Colors (Accessibility & Visual Cues) ──
+  static const Color delivered = Color(0xFF10B981); // Emerald Green
+  static const Color deliveredBg = Color(0xFFECFDF5);
+  static const Color cowMilk = Color(0xFFD97706); // Amber
+  static const Color cowMilkBg = Color(0xFFFEF3C7);
+  static const Color buffaloMilk = Color(0xFF06B6D4); // Cyan
+  static const Color buffaloMilkBg = Color(0xFFCFFAFE);
+  static const Color skipped = Color(0xFFEF4444); // Alert Red
+  static const Color skippedBg = Color(0xFFFEE2E2);
+  static const Color paused = Color(0xFFEF4444);
+
+  /// Resolves the primary color for a given milk type
+  static Color getMilkColor(String milkType) {
+    return milkType.toLowerCase() == 'buffalo' ? buffaloMilk : cowMilk;
+  }
+
+  /// Resolves the tinted background color for a given milk type
+  static Color getMilkBgColor(String milkType) {
+    return milkType.toLowerCase() == 'buffalo' ? buffaloMilkBg : cowMilkBg;
+  }
+
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,

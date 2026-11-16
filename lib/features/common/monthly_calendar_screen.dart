@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../config/theme.dart';
+import '../../models/milk_delivery.dart';
 import '../../providers/billing_provider.dart';
 
 class MonthlyCalendarScreen extends ConsumerStatefulWidget {
@@ -46,16 +47,16 @@ class _MonthlyCalendarScreenState extends ConsumerState<MonthlyCalendarScreen> {
         foregroundColor: Colors.white,
       ),
       backgroundColor: AppTheme.background,
-      body: FutureBuilder<List<Map<String, dynamic>>>(
+      body: FutureBuilder<List<MilkDelivery>>(
         key: ValueKey(_selectedMonth),
         future: billingRepo.getDeliveries(month: _selectedMonth),
         builder: (context, snapshot) {
           final deliveries = snapshot.data ?? [];
 
           // Build a map dateString -> list of deliveries
-          final Map<String, List<Map<String, dynamic>>> byDate = {};
+          final Map<String, List<MilkDelivery>> byDate = {};
           for (final d in deliveries) {
-            final date = (d['delivery_date'] ?? '').toString();
+            final date = d.deliveryDate.toIso8601String().split('T')[0];
             byDate.putIfAbsent(date, () => []).add(d);
           }
 
@@ -173,10 +174,10 @@ class _MonthlyCalendarScreenState extends ConsumerState<MonthlyCalendarScreen> {
                           date.month == DateTime.now().month &&
                           date.day == DateTime.now().day;
                       final skipped = dayDeliveries
-                          .any((e) => (e['status'] ?? '') == 'skipped');
+                          .any((e) => e.isSkipped);
                       final hasDelivery = dayDeliveries.isNotEmpty && !skipped;
                       final amount = dayDeliveries.fold<num>(
-                          0, (p, e) => p + (e['amount'] ?? 0));
+                          0, (p, e) => p + e.amount);
 
                       Color bgColor = AppTheme.surface;
                       Color dayNumColor = AppTheme.textPrimary;

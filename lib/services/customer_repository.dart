@@ -6,23 +6,48 @@ class CustomerRepository {
 
   CustomerRepository(this._client);
 
-  /// Get all customers (admin).
+  /// Get all customers (admin), joining route info and ordering by delivery sequence.
   Future<List<Customer>> getAllCustomers() async {
     final data = await _client
         .from('customers')
-        .select('*, profiles!customers_user_id_fkey(full_name, phone), sellers(profiles(full_name))')
-        .order('created_at', ascending: false);
+        .select('*, profiles!customers_user_id_fkey(full_name, phone), sellers(profiles(full_name)), delivery_routes(name)')
+        .order('delivery_sequence', ascending: true);
 
     return (data as List).map((e) => Customer.fromJson(e)).toList();
   }
 
-  /// Get customers assigned to a specific seller.
-  Future<List<Customer>> getCustomersBySeller(String sellerId) async {
+  /// Get customers assigned to a specific seller, optionally filtered by routeId or shift,
+  /// ordered by physical delivery sequence (1, 2, 3...).
+  Future<List<Customer>> getCustomersBySeller(
+    String sellerId, {
+    String? routeId,
+    String? shift,
+  }) async {
+    var query = _client
+        .from('customers')
+        .select('*, profiles!customers_user_id_fkey(full_name, phone), delivery_routes(name)')
+        .eq('seller_id', sellerId);
+
+    if (routeId != null && routeId.isNotEmpty) {
+      query = query.eq('route_id', routeId);
+    }
+
+    if (shift != null && shift.isNotEmpty && shift != 'both') {
+      // Return customers matching this shift OR 'both'
+      query = query.inFilter('delivery_shift', [shift, 'both']);
+    }
+
+    final data = await query.order('delivery_sequence', ascending: true);
+    return (data as List).map((e) => Customer.fromJson(e)).toList();
+  }
+
+  /// Get customers assigned to a specific route, ordered by delivery_sequence ASC.
+  Future<List<Customer>> getCustomersByRoute(String routeId) async {
     final data = await _client
         .from('customers')
-        .select('*, profiles!customers_user_id_fkey(full_name, phone)')
-        .eq('seller_id', sellerId)
-        .order('created_at', ascending: false);
+        .select('*, profiles!customers_user_id_fkey(full_name, phone), delivery_routes(name)')
+        .eq('route_id', routeId)
+        .order('delivery_sequence', ascending: true);
 
     return (data as List).map((e) => Customer.fromJson(e)).toList();
   }
@@ -31,7 +56,7 @@ class CustomerRepository {
   Future<Customer?> getCustomerByUserId(String userId) async {
     final data = await _client
         .from('customers')
-        .select('*, profiles!customers_user_id_fkey(full_name, phone), sellers(profiles(full_name))')
+        .select('*, profiles!customers_user_id_fkey(full_name, phone), sellers(profiles(full_name)), delivery_routes(name)')
         .eq('user_id', userId)
         .maybeSingle();
 
@@ -39,10 +64,11 @@ class CustomerRepository {
     return Customer.fromJson(data);
   }
 
+  /// Get customer by customer ID.
   Future<Customer?> getCustomerById(String id) async {
     final data = await _client
         .from('customers')
-        .select('*, profiles!customers_user_id_fkey(full_name, phone), sellers(profiles(full_name))')
+        .select('*, profiles!customers_user_id_fkey(full_name, phone), sellers(profiles(full_name)), delivery_routes(name)')
         .eq('id', id)
         .maybeSingle();
 
@@ -56,7 +82,10 @@ class CustomerRepository {
     required String fullName,
     required String phone,
     String? sellerId,
+    String? routeId,
     String? routeName,
+    int? deliverySequence,
+    String? deliveryShift,
     String? location,
     required String milkType,
     required num ratePerLiter,
@@ -69,7 +98,7 @@ class CustomerRepository {
       'phone': phone,
     }).eq('id', profileId);
 
-    await _client.from('customers').update({
+    final Map<String, dynamic> customerUpdates = {
       'seller_id': sellerId,
       'route_name': routeName,
       'location': location,
@@ -78,26 +107,47 @@ class CustomerRepository {
       'daily_quantity_liters': dailyQuantityLiters,
       'daily_quantity_ml': dailyQuantityMl,
       'status': status,
-    }).eq('id', customerId);
+    };
+    if (routeId != null) {
+      customerUpdates['route_id'] = routeId;
+    }
+    if (deliverySequence != null) {
+      customerUpdates['delivery_sequence'] = deliverySequence;
+    }
+    if (deliveryShift != null) {
+      customerUpdates['delivery_shift'] = deliveryShift;
+    }
+
+    await _client.from('customers').update(customerUpdates).eq('id', customerId);
   }
 
   /// Create a new customer (admin or seller).
   Future<Customer> createCustomer({
     required String userId,
     String? sellerId,
+    String? routeId,
     String? routeName,
+    int deliverySequence = 0,
+    String deliveryShift = 'morning',
     String? location,
     String milkType = 'cow',
     num ratePerLiter = 0,
+    num dailyQuantityLiters = 1,
+    num dailyQuantityMl = 0,
   }) async {
     final data = await _client.from('customers').insert({
       'user_id': userId,
       'seller_id': sellerId,
+      'route_id': routeId,
       'route_name': routeName,
+      'delivery_sequence': deliverySequence,
+      'delivery_shift': deliveryShift,
       'location': location,
       'milk_type': milkType,
       'rate_per_liter': ratePerLiter,
-    }).select('*, profiles!customers_user_id_fkey(full_name, phone)').single();
+      'daily_quantity_liters': dailyQuantityLiters,
+      'daily_quantity_ml': dailyQuantityMl,
+    }).select('*, profiles!customers_user_id_fkey(full_name, phone), delivery_routes(name)').single();
 
     return Customer.fromJson(data);
   }

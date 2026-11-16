@@ -42,28 +42,36 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     await Future<void>.delayed(const Duration(milliseconds: 1600));
     if (!mounted) return;
 
-    final authRepo = ref.read(authRepositoryProvider);
-    final rememberMe = await authRepo.getRememberMe();
-    if (!mounted) return;
+    try {
+      final authRepo = ref.read(authRepositoryProvider);
+      final rememberMe = await authRepo.getRememberMe();
+      if (!mounted) return;
 
-    if (!rememberMe) {
-      final hasUser = authRepo.currentUser != null;
-      if (hasUser) {
-        await authRepo.signOut();
+      if (!rememberMe) {
+        final hasUser = authRepo.currentUser != null;
+        if (hasUser) {
+          try {
+            await authRepo.signOut();
+          } catch (_) {}
+        }
+        if (!mounted) return;
+        context.go('/login');
+        return;
       }
+
+      final profile = await authRepo.getProfile();
+      if (!mounted) return;
+
+      if (profile == null) {
+        context.go('/login');
+        return;
+      }
+      _redirectByRole(profile.role);
+    } catch (e) {
+      debugPrint('Bootstrap navigation error: $e');
       if (!mounted) return;
       context.go('/login');
-      return;
     }
-
-    final profile = await authRepo.getProfile();
-    if (!mounted) return;
-
-    if (profile == null) {
-      context.go('/login');
-      return;
-    }
-    _redirectByRole(profile.role);
   }
 
   void _redirectByRole(String role) {
